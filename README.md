@@ -1,7 +1,7 @@
 # Opptra Discount Engine
 
 [![Live Demo](https://img.shields.io/badge/LIVE_DEMO-OPEN_APP-orange?style=for-the-badge&logo=vercel&logoColor=white)](https://opptra.vercel.app/)
-[![Loom Walkthrough](https://img.shields.io/badge/LOOM_WALKTHROUGH-COMING_SOON-625df5?style=for-the-badge&logo=loom&logoColor=white)](#loom-walkthrough)
+[![Loom Walkthrough](https://img.shields.io/badge/LOOM_WALKTHROUGH-WATCH_VIDEO-625df5?style=for-the-badge&logo=loom&logoColor=white)](https://www.loom.com/share/861c4e7c8c6546978d74257a2ab1fd65)
 
 This project implements the Opptra FDE Intern assignment: a customer-facing tool for applying discount rules to uploaded shopping carts accurately and transparently. It combines deterministic item- and cart-level pricing with optional AI-assisted rule creation and PDF cart ingestion, while keeping business calculations independent from input sources.
 
@@ -139,14 +139,12 @@ CSV rules, cart rows, PDF rows, direct cart-rule inputs, and AI responses are va
 Use Vercel’s local development workflow so the React app and Vercel API function run together.
 
 1. Install dependencies: `npm install`
-2. Create `.env.local` from `.env.example` and configure:
+2. Create `.env.local` from `.env.example`, configure it, and start the complete application with `npm run dev:vercel`:
 
    ```env
    GROQ_API_KEY=
    GROQ_MODEL=openai/gpt-oss-20b
    ```
-
-3. Start the complete application: `npm run dev:vercel`
 
 `GROQ_API_KEY` must be a valid server-side key for AI rule creation. `npm run dev` starts Vite only; it does not run the Vercel API function.
 
@@ -175,20 +173,20 @@ python scripts/generate-test-pdfs.py
 
 ## Submission links
 
-- **Production URL:** https://opptra.vercel.app/
-- **Loom walkthrough:** outstanding — add only after recording.
+- **Production URL:** [https://opptra.vercel.app/](https://opptra.vercel.app/)
+- **Loom walkthrough:** https://www.loom.com/share/861c4e7c8c6546978d74257a2ab1fd65
 - **Sample files:** `sample-data/rules.csv`, `sample-data/cart.csv`, `sample-data/sample-cart.pdf`, and `sample-data/sample-cart-invalid.pdf`.
 
 ## Live Demo
 
 Status: Deployed.
 
-Production URL: https://opptra.vercel.app/
+Production URL: [https://opptra.vercel.app/](https://opptra.vercel.app/)
 
 ## Loom Walkthrough
 
-Status: Awaiting recording.
+Status: Available.
 
-Video URL: TODO — replace with verified Loom share URL.
+Video URL: [https://www.loom.com/share/861c4e7c8c6546978d74257a2ab1fd65](https://www.loom.com/share/861c4e7c8c6546978d74257a2ab1fd65)
 
 For Vercel deployment, configure `GROQ_API_KEY` and `GROQ_MODEL` in Project Settings → Environment Variables for Development, Preview, and Production. Never commit a real API key.
