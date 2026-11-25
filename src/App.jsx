@@ -16,6 +16,7 @@ import { beginPdfAttempt, finishPdfAttempt, idlePdfAttempt } from './engine/cart
 import { processCart, cartTotal, applyCartDiscount } from './engine/discountEngine.js'
 import { prepareConfirmedAiRule, validateAiParseResponse } from './engine/ruleValidation.js'
 import { removeActiveRule } from './engine/ruleManagement.js'
+import { AI_RULE_EXAMPLES, selectAiRuleExample } from './components/aiRuleExamples.js'
 
 // ── Column definitions ───────────────────────────────────────────
 
@@ -111,6 +112,12 @@ const S = {
     borderRadius: 20, background: bg, color, textTransform: 'uppercase', letterSpacing: '0.04em',
   }),
   textarea: { width: '100%', minHeight: 88, resize: 'vertical', border: '1px solid #CECECE', borderRadius: 4, padding: 10, font: 'inherit', fontSize: 13 },
+  exampleList: { display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.4rem' },
+  exampleButton: (isActive) => ({
+    background: isActive ? '#fff1e8' : '#fff', color: '#131A48', border: `1px solid ${isActive ? '#FF5800' : '#CECECE'}`,
+    borderRadius: 14, padding: '0.3rem 0.55rem', fontSize: 11, lineHeight: 1.3, cursor: 'pointer', textAlign: 'left',
+    outline: 'none', boxShadow: isActive ? '0 0 0 2px rgba(255, 88, 0, 0.18)' : 'none',
+  }),
   message: (color) => ({ marginTop: 8, fontSize: 12, color }),
   preview: { marginTop: '0.8rem', padding: '0.85rem', border: '1px solid #cdd9ee', borderRadius: 4, background: '#f7faff', fontSize: 12, lineHeight: 1.7 },
   secondaryBtn: { background: '#fff', color: '#131A48', border: '1px solid #131A48', borderRadius: 4, padding: '0.55rem 1rem', fontSize: 12, fontWeight: 700, cursor: 'pointer' },
@@ -135,6 +142,7 @@ export default function App() {
   const [aiError, setAiError] = useState('')
   const [aiSuccess, setAiSuccess] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
+  const [activeAiExample, setActiveAiExample] = useState(null)
   const [ruleSuccess, setRuleSuccess] = useState('')
 
   // ── Handlers ──
@@ -283,6 +291,25 @@ export default function App() {
             <button style={aiLoading ? S.btnDisabled : S.btn} onClick={handleAiParse} disabled={aiLoading}>
               {aiLoading ? 'Parsing Rule…' : 'Parse Rule'}
             </button>
+          </div>
+          <div style={{ marginTop: '0.75rem', fontSize: 12, color: '#666' }}>
+            <strong style={{ color: '#131A48' }}>Try an example:</strong>
+            <div style={S.exampleList}>
+              {AI_RULE_EXAMPLES.map((example, index) => (
+                <button
+                  key={example}
+                  type="button"
+                  style={S.exampleButton(activeAiExample === index)}
+                  onClick={() => setAiInstruction(selectAiRuleExample(example))}
+                  onMouseEnter={() => setActiveAiExample(index)}
+                  onMouseLeave={() => setActiveAiExample(null)}
+                  onFocus={() => setActiveAiExample(index)}
+                  onBlur={() => setActiveAiExample(null)}
+                >
+                  {example}
+                </button>
+              ))}
+            </div>
           </div>
           {aiError && <div style={S.message('#b42318')}>{aiError}</div>}
           {aiSuccess && <div style={S.message('#1e5c2c')}>{aiSuccess}</div>}
