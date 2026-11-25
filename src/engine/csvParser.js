@@ -6,7 +6,7 @@
  * internal data shapes.
  *
  * Expected rules.csv columns:
- *   rule_id, scope, applies_to, type, value, stackable
+ *   rule_id, scope, applies_to, type, value, stackable, min_cart_value
  *
  * Expected cart.csv columns:
  *   item_id, product, brand, platform, base_price
@@ -25,8 +25,12 @@ export function parseRulesCSV(csvText) {
     transformHeader: (h) => h.trim().toLowerCase().replace(/\s+/g, '_'),
   })
 
-  if (parseErrors.length > 0) {
-    return { data: [], errors: parseErrors.map((e) => e.message) }
+  // A trailing optional min_cart_value is often omitted by CSV exporters.
+  // Required-field validation below produces a clearer per-rule error for any
+  // other short row, while genuine CSV syntax errors remain fatal.
+  const fatalParseErrors = parseErrors.filter((error) => error.code !== 'TooFewFields')
+  if (fatalParseErrors.length > 0) {
+    return { data: [], errors: fatalParseErrors.map((e) => e.message) }
   }
 
   const data = []
@@ -38,7 +42,6 @@ export function parseRulesCSV(csvText) {
 
     if (!row.rule_id) missing.push('rule_id')
     if (!row.scope) missing.push('scope')
-    if (!row.applies_to) missing.push('applies_to')
     if (!row.type) missing.push('type')
     if (row.value === undefined || row.value === '') missing.push('value')
     if (row.stackable === undefined || row.stackable === '') missing.push('stackable')
@@ -49,8 +52,13 @@ export function parseRulesCSV(csvText) {
     }
 
     const scope = row.scope.trim().toLowerCase()
-    if (scope !== 'brand' && scope !== 'platform') {
-      errors.push(`Row ${rowNum}: scope must be "brand" or "platform", got "${row.scope}"`)
+    if (!['brand', 'platform', 'cart'].includes(scope)) {
+      errors.push(`Row ${rowNum}: scope must be "brand", "platform", or "cart", got "${row.scope}"`)
+      return
+    }
+
+    if ((scope === 'brand' || scope === 'platform') && !row.applies_to?.trim()) {
+      errors.push(`Row ${rowNum}: applies_to is required for ${scope} rules`)
       return
     }
 
@@ -60,22 +68,58 @@ export function parseRulesCSV(csvText) {
       return
     }
 
-    const value = parseFloat(row.value)
-    if (isNaN(value) || value <= 0) {
-      errors.push(`Row ${rowNum}: value must be a positive number, got "${row.value}"`)
+    const value = Number(row.value.trim())
+    if (!Number.isFinite(value) || value <= 0) {
+      errors.push(`Row ${rowNum}: value must be a positive finite number, got "${row.value}"`)
+      return
+    }
+
+    if (type === 'percentage' && value > 100) {
+      errors.push(`Row ${rowNum}: percentage value cannot exceed 100, got "${row.value}"`)
       return
     }
 
     const stackableStr = row.stackable.trim().toLowerCase()
-    const stackable = stackableStr === 'true' || stackableStr === '1' || stackableStr === 'yes'
+    const stackableValues = {
+      true: true,
+      yes: true,
+      '1': true,
+      false: false,
+      no: false,
+      '0': false,
+    }
+    if (!Object.hasOwn(stackableValues, stackableStr)) {
+      errors.push(`Row ${rowNum}: stackable must be true/false, yes/no, or 1/0, got "${row.stackable}"`)
+      return
+    }
+
+    let minCartValue = null
+    if (scope === 'cart') {
+      if (type !== 'percentage') {
+        errors.push(`Row ${rowNum}: cart rules must use percentage discounts`)
+        return
+      }
+
+      if (row.min_cart_value === undefined || row.min_cart_value.trim() === '') {
+        errors.push(`Row ${rowNum}: min_cart_value is required for cart rules`)
+        return
+      }
+
+      minCartValue = Number(row.min_cart_value.trim())
+      if (!Number.isFinite(minCartValue) || minCartValue <= 0) {
+        errors.push(`Row ${rowNum}: min_cart_value must be a positive finite number, got "${row.min_cart_value}"`)
+        return
+      }
+    }
 
     data.push({
       ruleId: row.rule_id.trim(),
       scope,
-      appliesTo: row.applies_to.trim(),
+      appliesTo: scope === 'cart' ? null : row.applies_to.trim(),
       type,
       value,
-      stackable,
+      stackable: stackableValues[stackableStr],
+      minCartValue,
     })
   })
 
