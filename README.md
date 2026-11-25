@@ -1,6 +1,6 @@
 # Opptra Discount Engine
 
-[![Live Demo](https://img.shields.io/badge/LIVE_DEMO-COMING_SOON-orange?style=for-the-badge&logo=vercel&logoColor=white)](#live-demo)
+[![Live Demo](https://img.shields.io/badge/LIVE_DEMO-OPEN_APP-orange?style=for-the-badge&logo=vercel&logoColor=white)](https://opptra.vercel.app/)
 [![Loom Walkthrough](https://img.shields.io/badge/LOOM_WALKTHROUGH-COMING_SOON-625df5?style=for-the-badge&logo=loom&logoColor=white)](#loom-walkthrough)
 
 This project implements the Opptra FDE Intern assignment: a customer-facing tool for applying discount rules to uploaded shopping carts accurately and transparently. It combines deterministic item- and cart-level pricing with optional AI-assisted rule creation and PDF cart ingestion, while keeping business calculations independent from input sources.
@@ -175,15 +175,15 @@ python scripts/generate-test-pdfs.py
 
 ## Submission links
 
-- **Production URL:** outstanding — add only after production verification.
+- **Production URL:** https://opptra.vercel.app/
 - **Loom walkthrough:** outstanding — add only after recording.
 - **Sample files:** `sample-data/rules.csv`, `sample-data/cart.csv`, `sample-data/sample-cart.pdf`, and `sample-data/sample-cart-invalid.pdf`.
 
 ## Live Demo
 
-Status: Awaiting production deployment.
+Status: Deployed.
 
-Production URL: TODO — replace with verified URL.
+Production URL: https://opptra.vercel.app/
 
 ## Loom Walkthrough
 
